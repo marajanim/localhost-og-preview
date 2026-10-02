@@ -2,9 +2,15 @@
 
 **See how your links will look on WhatsApp, iMessage, Facebook, LinkedIn and X (Twitter) — before you deploy.**
 
+[![npm version](https://img.shields.io/npm/v/localhost-og-preview.svg)](https://www.npmjs.com/package/localhost-og-preview)
+[![npm downloads](https://img.shields.io/npm/dm/localhost-og-preview.svg)](https://www.npmjs.com/package/localhost-og-preview)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node.js 18+](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)
 ![Zero dependencies](https://img.shields.io/badge/dependencies-0-success.svg)
+
+```bash
+npx localhost-og-preview --target http://localhost:3000 --open
+```
 
 You built a page, added your `og:image`, `og:title` and `og:description`… and now you want to know: **what will it look like when someone shares the link?**
 
@@ -51,19 +57,19 @@ node -v
 
 For example `npm run dev`. Keep it running and note the address it shows, like `http://localhost:3000`.
 
-### 2. Download this tool and start it
+### 2. Start the tool
 
 Open a **second** terminal window (leave your website running in the first one) and run:
 
 ```bash
-git clone https://github.com/marajanim/localhost-og-preview.git
-cd localhost-og-preview
-node bin/localhost-og-preview.js --target http://localhost:3000 --open
+npx localhost-og-preview --target http://localhost:3000 --open
 ```
+
+That's the whole install: `npx` downloads it and runs it in one go. The first time it may ask *"Ok to proceed? (y)"*; press **y** and Enter.
 
 > Use your own website's address after `--target`. Not sure which one? See [Which address is my site on?](#which-address-is-my-site-on)
 
-> No `git`? Click the green **Code** button at the top of this page → **Download ZIP**, unzip it, then open a terminal inside that folder and run the last line.
+> 💡 The tool keeps running in that terminal (the blinking cursor is normal). Press **Ctrl + C** there when you're done.
 
 ### 3. Check a page
 
@@ -117,7 +123,7 @@ Most sites put the **full live address** in their image tag, like:
 That image might not exist on the live site yet, because you just made it! Add your live address with `--site-url`, and the tool loads those images from your **local** site instead:
 
 ```bash
-node bin/localhost-og-preview.js --target http://localhost:3000 --site-url https://mysite.com --open
+npx localhost-og-preview --target http://localhost:3000 --site-url https://mysite.com --open
 ```
 
 Bonus: you can now also paste live links (like `https://mysite.com/about`) into the box, and it checks your local version of that page.
@@ -136,24 +142,44 @@ Bonus: you can now also paste live links (like `https://mysite.com/about`) into 
 
 You can also set them as environment variables: `OG_PREVIEW_TARGET`, `OG_PREVIEW_SITE_URL`, `OG_PREVIEW_PORT`.
 
-Prefer npm scripts? This works too:
+### Install it permanently (optional)
+
+`npx` is all you need, but if you use it a lot you can install it once:
 
 ```bash
-npm start -- --target http://localhost:5173 --open
-```
-
-### Use it from anywhere (optional)
-
-Inside the downloaded folder, run this once:
-
-```bash
-npm link
+npm install -g localhost-og-preview
 ```
 
 Now you can start it from **any** folder with just:
 
 ```bash
 localhost-og-preview --target http://localhost:3000 --open
+```
+
+### Add it to your project (optional)
+
+Want your whole team to have it? Add it as a dev dependency:
+
+```bash
+npm install --save-dev localhost-og-preview
+```
+
+Then add a script to your `package.json`:
+
+```json
+"scripts": {
+  "og": "localhost-og-preview --target http://localhost:3000 --open"
+}
+```
+
+And run `npm run og` whenever you want to check your previews.
+
+### Run it from the source code
+
+```bash
+git clone https://github.com/marajanim/localhost-og-preview.git
+cd localhost-og-preview
+node bin/localhost-og-preview.js --target http://localhost:3000 --open
 ```
 
 ---
