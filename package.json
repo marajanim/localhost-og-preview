@@ -1,0 +1,50 @@
+{
+  "name": "localhost-og-preview",
+  "version": "1.0.0",
+  "description": "Test Open Graph tags and link previews on localhost before you deploy. See exactly how your links look when shared on WhatsApp, iMessage, Facebook, LinkedIn and X (Twitter). Checks og:image size, shape and loading, missing meta tags and broken previews. Zero-dependency Node.js tool that works with Next.js, React, Vue or any local website.",
+  "bin": {
+    "localhost-og-preview": "bin/localhost-og-preview.js"
+  },
+  "scripts": {
+    "start": "node bin/localhost-og-preview.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marajanim/localhost-og-preview.git"
+  },
+  "homepage": "https://github.com/marajanim/localhost-og-preview#readme",
+  "bugs": {
+    "url": "https://github.com/marajanim/localhost-og-preview/issues"
+  },
+  "keywords": [
+    "open-graph",
+    "og-image",
+    "og-tags",
+    "opengraph",
+    "link-preview",
+    "localhost",
+    "meta-tags",
+    "social-preview",
+    "social-share",
+    "whatsapp",
+    "imessage",
+    "facebook-debugger",
+    "twitter-card",
+    "linkedin",
+    "seo",
+    "nextjs",
+    "developer-tools",
+    "cli"
+  ],
+  "author": "marajanim",
+  "license": "MIT"
+}

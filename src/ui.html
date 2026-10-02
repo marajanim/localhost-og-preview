@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>localhost-og-preview - Open Graph &amp; link preview tester</title>
+<style>
+  :root {
+    --bg: #f3f4f8; --card: #ffffff; --text: #1e1f2a; --muted: #6b6e7d; --line: #e5e7ef;
+    --brand: #566def; --ok: #1e8a4d; --warn: #b7791f; --error: #d64545; --info: #566def;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 22px; margin: 0; }
+  .sub { color: var(--muted); margin: 4px 0 0; font-size: 13px; }
+  .target { margin-top: 6px; font-size: 12px; color: var(--muted); }
+  .target code { background: #e8eafb; color: #3f55d2; padding: 1px 6px; border-radius: 6px; }
+  form { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+  input { flex: 1 1 420px; height: 42px; border: 1px solid #d9dce6; border-radius: 10px; padding: 0 12px; font-size: 14px; background: #fff; }
+  input:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
+  button.primary { height: 42px; padding: 0 20px; border: 0; border-radius: 10px; background: var(--brand); color: #fff; font-weight: 600; font-size: 14px; cursor: pointer; }
+  button.primary:disabled { opacity: .6; cursor: wait; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .chip { font-size: 12px; padding: 5px 10px; border-radius: 999px; border: 1px solid #d9dce6; background: #fff; cursor: pointer; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .status { margin-top: 18px; color: var(--muted); font-size: 13px; }
+  .error-box { margin-top: 18px; padding: 12px 14px; border-radius: 10px; background: #fff1f1; color: var(--error); }
+  .section { margin-top: 18px; background: var(--card); border-radius: 14px; padding: 16px; }
+  .section h2 { font-size: 13px; margin: 0 0 10px; color: #4e5158; }
+  .checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .checks li { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; }
+  .badge { flex-shrink: 0; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 999px; color: #fff; }
+  .badge.ok { background: var(--ok); } .badge.warn { background: var(--warn); } .badge.error { background: var(--error); } .badge.info { background: var(--info); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 18px; }
+  .mock h3 { font-size: 13px; margin: 0 0 8px; color: #4e5158; }
+  .clamp1 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .clamp2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .clamp3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .noimg { background: repeating-linear-gradient(45deg, #2a3942, #2a3942 6px, #22313a 6px, #22313a 12px); }
+  /* WhatsApp */
+  .wa-chat { background: #0b141a; padding: 14px 12px; border-radius: 12px; }
+  .wa-bubble { border-radius: 10px; padding: 4px; max-width: 340px; }
+  .wa-in { background: #202c33; }
+  .wa-out { background: #005c4b; margin-left: auto; }
+  .wa-card { border-radius: 7px; overflow: hidden; }
+  .wa-in .wa-card { background: #1a2329; }
+  .wa-out .wa-card { background: #0a4136; }
+  .wa-photo img, .wa-photo .noimg { display: block; width: 100%; object-fit: cover; }
+  .wa-small { display: flex; }
+  .wa-small img, .wa-small .noimg { width: 86px; height: 86px; object-fit: cover; flex-shrink: 0; }
+  .wa-text { padding: 8px 10px 9px; min-width: 0; }
+  .wa-title { color: #e9edef; font-size: 14px; font-weight: 600; line-height: 1.3; }
+  .wa-desc { color: #8696a0; font-size: 13px; margin-top: 3px; line-height: 1.35; }
+  .wa-domain { color: #8696a0; font-size: 13px; margin-top: 3px; }
+  .wa-site { display: flex; align-items: center; gap: 6px; color: #8696a0; font-size: 13px; margin-top: 6px; }
+  .wa-link { color: #00a884; font-size: 13px; padding: 6px 6px 0; word-break: break-all; text-decoration: underline; text-underline-offset: 2px; }
+  .wa-meta { display: flex; justify-content: flex-end; align-items: center; gap: 3px; color: #8696a0; font-size: 11px; padding: 2px 6px 1px; }
+  .wa-out .wa-meta { color: #99beb7; }
+  .wa-ticks { color: #53bdeb; font-size: 12px; letter-spacing: -3px; margin-right: 3px; }
+  .wide img, .wide .noimg { display: block; width: 100%; aspect-ratio: 1.91 / 1; object-fit: cover; }
+  .natural img, .natural .noimg { display: block; width: 100%; object-fit: cover; }
+  /* iMessage */
+  .im { background: #fff; padding: 12px; border-radius: 12px; border: 1px solid var(--line); }
+  .im-card { max-width: 300px; margin-left: auto; border-radius: 18px; overflow: hidden; background: #e9e9eb; }
+  .im-text { padding: 8px 12px; }
+  .im-title { font-size: 13px; font-weight: 600; }
+  .im-domain { font-size: 12px; color: #8e8e93; margin-top: 2px; }
+  /* Facebook / LinkedIn */
+  .fb { background: #fff; border-radius: 12px; border: 1px solid var(--line); overflow: hidden; }
+  .fb-text { padding: 10px 12px; background: #f0f2f5; }
+  .fb-domain { font-size: 11px; color: #65676b; text-transform: uppercase; }
+  .fb-title { font-size: 15px; font-weight: 600; margin-top: 2px; }
+  .fb-desc { font-size: 13px; color: #65676b; margin-top: 2px; }
+  /* X */
+  .x { background: #000; padding: 12px; border-radius: 12px; }
+  .x-card { border: 1px solid #2f3336; border-radius: 16px; overflow: hidden; position: relative; }
+  .x-label { position: absolute; left: 10px; bottom: 10px; background: rgba(0,0,0,.77); color: #fff; font-size: 12px; padding: 2px 6px; border-radius: 4px; max-width: 85%; }
+  .x-summary { display: flex; }
+  .x-summary img, .x-summary .noimg { width: 120px; height: 120px; object-fit: cover; flex-shrink: 0; border-right: 1px solid #2f3336; }
+  .x-text { padding: 10px 12px; min-width: 0; color: #e7e9ea; }
+  .x-domain { color: #71767b; font-size: 13px; }
+  .x-title { font-size: 14px; }
+  .x-desc { color: #71767b; font-size: 13px; }
+  .x-below { color: #71767b; font-size: 12px; margin-top: 4px; }
+  /* Image + tags */
+  .image-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+  .image-row img { max-width: 100%; max-height: 260px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+  .kv { font-size: 12px; color: var(--muted); display: grid; gap: 4px; }
+  .kv b { color: var(--text); font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  td { padding: 6px 8px; border-top: 1px solid var(--line); vertical-align: top; word-break: break-all; }
+  td:first-child { color: var(--muted); white-space: nowrap; word-break: normal; }
+  .missing { color: #b3b6c2; font-style: italic; }
+  .note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>localhost-og-preview</h1>
+  <p class="sub">See how your local site's links will look when shared on WhatsApp, iMessage, Facebook, LinkedIn and X.</p>
+  <p class="target" id="target"></p>
+
+  <form id="form">
+    <input id="url" placeholder="/events/my-event   or   http://localhost:3000/page   or   https://yoursite.com/page" autocomplete="off">
+    <button class="primary" id="go" type="submit">Check preview</button>
+  </form>
+  <div class="chips" id="recent"></div>
+
+  <div id="out"></div>
+</div>
+
+<script>
+const CONFIG = __CONFIG__;
+const RECENT_KEY = "localhost-og-preview:recent";
+
+const $ = (id) => document.getElementById(id);
+
+function el(tag, props = {}, children = []) {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(props)) {
+    if (value == null) continue;
+    if (key === "class") node.className = value;
+    else if (key === "text") node.textContent = value;
+    else node.setAttribute(key, value);
+  }
+  for (const child of [].concat(children)) if (child) node.append(child);
+  return node;
+}
+
+// A fresh copy on every check, so the browser never shows a cached old image.
+let checkId = Date.now();
+function img(src, extra = {}) {
+  if (!src) return el("div", { class: "noimg", title: "No image" });
+  const fresh = `${src}${src.includes("?") ? "&" : "?"}_spt=${checkId}`;
+  return el("img", { src: fresh, alt: "", loading: "lazy", referrerpolicy: "no-referrer", ...extra });
+}
+
+function readRecent() {
+  try { return JSON.parse(localStorage.getItem(RECENT_KEY) || "[]"); } catch { return []; }
+}
+function saveRecent(value) {
+  try {
+    const list = [value, ...readRecent().filter((v) => v !== value)].slice(0, 8);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(list));
+  } catch {}
+  renderRecent();
+}
+function renderRecent() {
+  const box = $("recent");
+  box.replaceChildren();
+  const list = readRecent();
+  if (list.length === 0) {
+    ["/"].forEach((v) => box.append(chip(v)));
+    return;
+  }
+  list.forEach((v) => box.append(chip(v)));
+}
+function chip(value) {
+  const b = el("button", { class: "chip", type: "button", title: value, text: value });
+  b.onclick = () => { $("url").value = value; check(); };
+  return b;
+}
+
+function renderChecks(checks) {
+  const order = { error: 0, warn: 1, info: 2, ok: 3 };
+  const label = { error: "FIX", warn: "WARN", info: "INFO", ok: "OK" };
+  const list = el("ul", { class: "checks" });
+  [...checks].sort((a, b) => order[a.level] - order[b.level]).forEach((c) => {
+    list.append(el("li", {}, [el("span", { class: `badge ${c.level}`, text: label[c.level] }), el("span", { text: c.text })]));
+  });
+  return el("section", { class: "section" }, [el("h2", { text: "Checks" }), list]);
+}
+
+// WhatsApp and iMessage keep the image's own shape, but no wider than 1.91:1
+// and no taller than 4:5 - beyond that they crop.
+function naturalImg(src, size) {
+  const ratio = size && size.width && size.height ? size.width / size.height : 1.91;
+  const clamped = Math.min(1.91, Math.max(0.8, ratio));
+  return img(src, { style: `aspect-ratio: ${clamped.toFixed(3)} / 1` });
+}
+
+function time() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
+function linkIcon() {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("width", "15");
+  svg.setAttribute("height", "15");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("fill", "none");
+  svg.setAttribute("stroke", "currentColor");
+  svg.setAttribute("stroke-width", "2");
+  svg.setAttribute("stroke-linecap", "round");
+  const a = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  a.setAttribute("d", "M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5");
+  const b = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  b.setAttribute("d", "M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5");
+  svg.append(a, b);
+  return svg;
+}
+
+function mocks(p, image) {
+  const title = p.title || "(no title)";
+  const desc = p.description || "";
+  const domain = p.domain || "";
+  const big = p.twitterCard === "summary_large_image";
+  const size = image && image.size;
+
+  const waReceived = el("div", { class: "mock" }, [
+    el("h3", { text: "WhatsApp - received (web / desktop)" }),
+    el("div", { class: "wa-chat" }, el("div", { class: "wa-bubble wa-in" }, [
+      el("div", { class: "wa-card" }, [
+        el("div", { class: "wa-photo" }, naturalImg(p.image, size)),
+        el("div", { class: "wa-text" }, [
+          el("div", { class: "wa-title clamp2", text: title }),
+          el("div", { class: "wa-desc clamp2", text: desc }),
+          el("div", { class: "wa-domain", text: domain }),
+        ]),
+      ]),
+      el("div", { class: "wa-link", text: p.url }),
+      el("div", { class: "wa-meta", text: time() }),
+    ])),
+  ]);
+
+  const waSent = el("div", { class: "mock" }, [
+    el("h3", { text: "WhatsApp - sent (phone)" }),
+    el("div", { class: "wa-chat" }, el("div", { class: "wa-bubble wa-out" }, [
+      el("div", { class: "wa-card" }, [
+        el("div", { class: "wa-photo" }, naturalImg(p.image, size)),
+        el("div", { class: "wa-text" }, [
+          el("div", { class: "wa-title clamp2", text: title }),
+          el("div", { class: "wa-desc clamp2", text: desc }),
+          el("div", { class: "wa-site" }, [linkIcon(), el("span", { text: domain })]),
+        ]),
+      ]),
+      el("div", { class: "wa-meta" }, [el("span", { text: time() }), el("span", { class: "wa-ticks", text: "✓✓" })]),
+    ])),
+  ]);
+
+  const waSmall = el("div", { class: "mock" }, [
+    el("h3", { text: "WhatsApp - small thumbnail (small images)" }),
+    el("div", { class: "wa-chat" }, el("div", { class: "wa-bubble wa-in" }, [
+      el("div", { class: "wa-card wa-small" }, [
+        img(p.image),
+        el("div", { class: "wa-text" }, [
+          el("div", { class: "wa-title clamp1", text: title }),
+          el("div", { class: "wa-desc clamp2", text: desc }),
+          el("div", { class: "wa-domain", text: domain }),
+        ]),
+      ]),
+      el("div", { class: "wa-link", text: p.url }),
+      el("div", { class: "wa-meta", text: time() }),
+    ])),
+  ]);
+
+  const iMessage = el("div", { class: "mock" }, [
+    el("h3", { text: "iMessage" }),
+    el("div", { class: "im" }, el("div", { class: "im-card natural" }, [
+      naturalImg(p.image, size),
+      el("div", { class: "im-text" }, [
+        el("div", { class: "im-title clamp2", text: title }),
+        el("div", { class: "im-domain", text: domain }),
+      ]),
+    ])),
+  ]);
+
+  const facebook = el("div", { class: "mock" }, [
+    el("h3", { text: "Facebook / LinkedIn" }),
+    el("div", { class: "fb wide" }, [
+      img(p.image),
+      el("div", { class: "fb-text" }, [
+        el("div", { class: "fb-domain", text: domain }),
+        el("div", { class: "fb-title clamp2", text: title }),
+        el("div", { class: "fb-desc clamp1", text: desc }),
+      ]),
+    ]),
+  ]);
+
+  const x = el("div", { class: "mock" }, [
+    el("h3", { text: big ? "X (Twitter) - large image card" : "X (Twitter) - summary card" }),
+    el("div", { class: "x" }, big
+      ? [el("div", { class: "x-card wide" }, [img(p.image), el("div", { class: "x-label clamp1", text: title })]),
+         el("div", { class: "x-below", text: `From ${domain}` })]
+      : el("div", { class: "x-card x-summary" }, [
+          img(p.image),
+          el("div", { class: "x-text" }, [
+            el("div", { class: "x-domain", text: domain }),
+            el("div", { class: "x-title clamp1", text: title }),
+            el("div", { class: "x-desc clamp2", text: desc }),
+          ]),
+        ])),
+  ]);
+
+  return el("div", { class: "grid" }, [waReceived, waSent, waSmall, iMessage, facebook, x]);
+}
+
+function imageSection(r) {
+  const p = r.preview;
+  const section = el("section", { class: "section" }, el("h2", { text: "Share image" }));
+  if (!p.image) {
+    section.append(el("p", { class: "missing", text: "This page has no og:image." }));
+    return section;
+  }
+  const i = r.image || {};
+  const size = i.size ? `${i.size.width} x ${i.size.height} (${(i.size.width / i.size.height).toFixed(2)}:1) ${i.size.type}` : "unknown";
+  const kb = i.bytes != null ? (i.bytes < 1048576 ? `${Math.round(i.bytes / 1024)} KB` : `${(i.bytes / 1048576).toFixed(1)} MB`) : "unknown";
+  section.append(el("div", { class: "image-row" }, [
+    img(p.image),
+    el("div", { class: "kv" }, [
+      el("div", {}, [el("b", { text: "Size: " }), document.createTextNode(size)]),
+      el("div", {}, [el("b", { text: "File: " }), document.createTextNode(`${kb}, ${i.contentType || "unknown type"}`)]),
+      el("div", {}, [el("b", { text: "Status: " }), document.createTextNode(i.ok ? `HTTP ${i.status}` : (i.error || `HTTP ${i.status}`))]),
+      el("div", {}, [el("b", { text: "The page says: " }), document.createTextNode(p.rawImage)]),
+      p.image !== p.rawImage ? el("div", {}, [el("b", { text: "Loaded from: " }), document.createTextNode(p.image)]) : null,
+    ]),
+  ]));
+  return section;
+}
+
+function tagsSection(r) {
+  const keys = ["og:title", "og:description", "og:image", "og:image:width", "og:image:height", "og:image:alt", "og:url", "og:type", "og:site_name",
+    "twitter:card", "twitter:title", "twitter:description", "twitter:image", "description"];
+  const extra = Object.keys(r.meta).filter((k) => (k.startsWith("og:") || k.startsWith("twitter:")) && !keys.includes(k));
+  const table = el("table");
+  [...keys, ...extra].forEach((k) => {
+    const v = r.meta[k];
+    table.append(el("tr", {}, [el("td", { text: k }), v == null ? el("td", { class: "missing", text: "missing" }) : el("td", { text: v })]));
+  });
+  return el("section", { class: "section" }, [
+    el("h2", { text: `Tags the page sends (HTTP ${r.status}, ${(r.ms / 1000).toFixed(1)}s)` }),
+    table,
+    el("p", { class: "note", text: `Fetched ${r.pageUrl} as a link-preview bot. These mock-ups are close to the real apps but not pixel-perfect.` }),
+  ]);
+}
+
+async function check() {
+  const value = $("url").value.trim() || "/";
+  checkId = Date.now();
+  $("go").disabled = true;
+  $("go").textContent = "Checking...";
+  $("out").replaceChildren(el("p", { class: "status", text: "Loading the page like WhatsApp would... the first visit to a page can take a while on a dev server." }));
+  try {
+    const res = await fetch(`/api/inspect?url=${encodeURIComponent(value)}`);
+    const r = await res.json();
+    if (r.error) {
+      $("out").replaceChildren(el("div", { class: "error-box", text: r.error }));
+      return;
+    }
+    saveRecent(value);
+    $("out").replaceChildren(renderChecks(r.checks), mocks(r.preview, r.image), imageSection(r), tagsSection(r));
+  } catch (err) {
+    $("out").replaceChildren(el("div", { class: "error-box", text: `The tester could not be reached: ${err.message}` }));
+  } finally {
+    $("go").disabled = false;
+    $("go").textContent = "Check preview";
+  }
+}
+
+$("target").append(
+  document.createTextNode("Checking "), el("code", { text: CONFIG.target }),
+  ...(CONFIG.siteUrl ? [document.createTextNode("   Live site "), el("code", { text: CONFIG.siteUrl })] : []),
+);
+$("form").addEventListener("submit", (e) => { e.preventDefault(); check(); });
+renderRecent();
+</script>
+</body>
+</html>
