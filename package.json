@@ -1,6 +1,6 @@
 {
   "name": "localhost-og-preview",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Test Open Graph tags and link previews on localhost before you deploy. See exactly how your links look when shared on WhatsApp, iMessage, Facebook, LinkedIn and X (Twitter). Checks og:image size, shape and loading, missing meta tags and broken previews. Zero-dependency Node.js tool that works with Next.js, React, Vue or any local website.",
   "bin": {
     "localhost-og-preview": "bin/localhost-og-preview.js"
