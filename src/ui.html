@@ -364,6 +364,13 @@ $("target").append(
 );
 $("form").addEventListener("submit", (e) => { e.preventDefault(); check(); });
 renderRecent();
+
+// http://localhost:4545/?url=/some-page checks that page straight away.
+const startUrl = new URLSearchParams(location.search).get("url");
+if (startUrl) {
+  $("url").value = startUrl;
+  check();
+}
 </script>
 </body>
 </html>

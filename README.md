@@ -14,6 +14,10 @@ The usual answer is "deploy it and find out", because WhatsApp, the Facebook Sha
 
 ✅ Test Open Graph tags on localhost &nbsp;·&nbsp; ✅ Preview `og:image` locally &nbsp;·&nbsp; ✅ WhatsApp, iMessage, Facebook, LinkedIn & X mock-ups &nbsp;·&nbsp; ✅ Zero dependencies &nbsp;·&nbsp; ✅ Works with any framework
 
+![localhost-og-preview showing how a localhost page looks as a link preview on WhatsApp, iMessage, Facebook, LinkedIn and X](docs/preview.png)
+
+<sub>A blog post running on `localhost`, previewed as a WhatsApp message (received and sent), WhatsApp thumbnail, iMessage bubble, Facebook / LinkedIn post and X card.</sub>
+
 ---
 
 ## Why you'll like it
@@ -81,6 +85,8 @@ That's it. You'll see how the link looks in every app, plus what to fix. 🚀
 4. **Tags:** every Open Graph and Twitter Card tag your page sends, and which ones are missing.
 
 The last 8 pages you checked show up as buttons, so re-checking after a fix is one click.
+
+> 💡 **Shortcut:** open `http://localhost:4545/?url=/blog/my-first-post` and it checks that page straight away. Handy for bookmarking the pages you test most.
 
 ---
 
@@ -153,6 +159,10 @@ localhost-og-preview --target http://localhost:3000 --open
 ---
 
 ## What the checks mean
+
+Here it catches five problems on one page: Markdown in the description, a relative image URL, a 4.5 MB image, a square image that Facebook, LinkedIn and X will crop, and a missing `twitter:card`.
+
+![localhost-og-preview catching og:image and Open Graph problems: image too big, relative URL, Markdown in description, square image, missing twitter:card](docs/checks.png)
 
 | Check | What it means | How to fix it |
 |---|---|---|
